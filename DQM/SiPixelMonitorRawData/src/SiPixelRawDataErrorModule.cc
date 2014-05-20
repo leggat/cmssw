@@ -100,61 +100,61 @@ void SiPixelRawDataErrorModule::book(const edm::ParameterSet& iConfig, int type,
 //
 void SiPixelRawDataErrorModule::bookFED(const edm::ParameterSet& iConfig) {
 //std::cout<<"Entering SiPixelRawDataErrorModule::bookFED: "<<std::endl;
-  std::string hid;
-  // Get collection name and instantiate Histo Id builder
-  edm::InputTag src = iConfig.getParameter<edm::InputTag>( "src" );
-  SiPixelHistogramId* theHistogramId = new SiPixelHistogramId( src.label() );
-  // Get DQM interface
-  DQMStore* theDMBE = edm::Service<DQMStore>().operator->();
-  // Types of errors
-  hid = theHistogramId->setHistoId("errorType",id_);
-  meErrorType_ = theDMBE->book1D(hid,"Type of errors",15,24.5,39.5);
-  meErrorType_->setAxisTitle("Type of errors",1);
-  // Number of errors
-  hid = theHistogramId->setHistoId("NErrors",id_);
-  meNErrors_ = theDMBE->book1D(hid,"Number of errors",36,0.,36.);
-  meNErrors_->setAxisTitle("Number of errors",1);
-  // Type of FIFO full (errorType = 28).  FIFO 1 is 1-5 (where fullType = channel of FIFO 1), 
-  // fullType = 6 signifies FIFO 2 nearly full, 7 signifies trigger FIFO nearly full, 8 
-  // indicates an unexpected result
-  hid = theHistogramId->setHistoId("fullType",id_);
-  meFullType_ = theDMBE->book1D(hid,"Type of FIFO full",7,0.5,7.5);
-  meFullType_->setAxisTitle("FIFO type",1);
-  // For error type 30, the type of problem encoded in the TBM trailer
-  // 0 = stack full, 1 = Pre-cal issued, 2 = clear trigger counter, 3 = sync trigger, 
-  // 4 = sync trigger error, 5 = reset ROC, 6 = reset TBM, 7 = no token bit pass
-  hid = theHistogramId->setHistoId("TBMMessage",id_);
-  meTBMMessage_ = theDMBE->book1D(hid,"TBM trailer message",8,-0.5,7.5);
-  meTBMMessage_->setAxisTitle("TBM message",1);
-  // For error type 30, the type of problem encoded in the TBM error trailer 0 = none
-  // 1 = data stream too long, 2 = FSM errors, 3 = invalid # of ROCs, 4 = multiple
-  hid = theHistogramId->setHistoId("TBMType",id_);
-  meTBMType_ = theDMBE->book1D(hid,"Type of TBM trailer",5,-0.5,4.5);
-  meTBMType_->setAxisTitle("TBM Type",1);
-  // For error type 31, the event number of the TBM header with the error
-  hid = theHistogramId->setHistoId("EvtNbr",id_);
-  meEvtNbr_ = theDMBE->bookInt(hid);
-  // For errorType = 34, datastream size according to error word
-  hid = theHistogramId->setHistoId("evtSize",id_);
-  meEvtSize_ = theDMBE->bookInt(hid);
-  
-  for(int j=0; j!=37; j++){
-    std::stringstream temp; temp << j;
-    hid = "FedChNErrArray_" + temp.str();
-    meFedChNErrArray_[j] = theDMBE->bookInt(hid);
-    hid = "FedChLErrArray_" + temp.str();
-    meFedChLErrArray_[j] = theDMBE->bookInt(hid);
-    hid = "FedETypeNErrArray_" + temp.str();
-    if(j<21) meFedETypeNErrArray_[j] = theDMBE->bookInt(hid);
-  }
-  delete theHistogramId;
+//   std::string hid;
+//   // Get collection name and instantiate Histo Id builder
+//   edm::InputTag src = iConfig.getParameter<edm::InputTag>( "src" );
+//   SiPixelHistogramId* theHistogramId = new SiPixelHistogramId( src.label() );
+
+  //This booking moved to the source code, but kept here for posterity.
+//   // Types of errors
+//   hid = theHistogramId->setHistoId("errorType",id_);
+//   meErrorType_ = iBooker.book1D(hid,"Type of errors",15,24.5,39.5);
+//   meErrorType_->setAxisTitle("Type of errors",1);
+//   // Number of errors
+//   hid = theHistogramId->setHistoId("NErrors",id_);
+//   meNErrors_ = iBooker.book1D(hid,"Number of errors",36,0.,36.);
+//   meNErrors_->setAxisTitle("Number of errors",1);
+//   // Type of FIFO full (errorType = 28).  FIFO 1 is 1-5 (where fullType = channel of FIFO 1), 
+//   // fullType = 6 signifies FIFO 2 nearly full, 7 signifies trigger FIFO nearly full, 8 
+//   // indicates an unexpected result
+//   hid = theHistogramId->setHistoId("fullType",id_);
+//   meFullType_ = iBooker.book1D(hid,"Type of FIFO full",7,0.5,7.5);
+//   meFullType_->setAxisTitle("FIFO type",1);
+//   // For error type 30, the type of problem encoded in the TBM trailer
+//   // 0 = stack full, 1 = Pre-cal issued, 2 = clear trigger counter, 3 = sync trigger, 
+//   // 4 = sync trigger error, 5 = reset ROC, 6 = reset TBM, 7 = no token bit pass
+//   hid = theHistogramId->setHistoId("TBMMessage",id_);
+//   meTBMMessage_ = iBooker.book1D(hid,"TBM trailer message",8,-0.5,7.5);
+//   meTBMMessage_->setAxisTitle("TBM message",1);
+//   // For error type 30, the type of problem encoded in the TBM error trailer 0 = none
+//   // 1 = data stream too long, 2 = FSM errors, 3 = invalid # of ROCs, 4 = multiple
+//   hid = theHistogramId->setHistoId("TBMType",id_);
+//   meTBMType_ = iBooker.book1D(hid,"Type of TBM trailer",5,-0.5,4.5);
+//   meTBMType_->setAxisTitle("TBM Type",1);
+//   // For error type 31, the event number of the TBM header with the error
+//   hid = theHistogramId->setHistoId("EvtNbr",id_);
+//   meEvtNbr_ = iBooker.bookInt(hid);
+//   // For errorType = 34, datastream size according to error word
+//   hid = theHistogramId->setHistoId("evtSize",id_);
+//  meEvtSize_ = iBooker.bookInt(hid);
+    
+//   for(int j=0; j!=37; j++){
+//     std::stringstream temp; temp << j;
+//     hid = "FedChNErrArray_" + temp.str();
+//     meFedChNErrArray_[j] = iBooker.bookInt(hid);
+//     hid = "FedChLErrArray_" + temp.str();
+//     meFedChLErrArray_[j] = iBooker.bookInt(hid);
+//     hid = "FedETypeNErrArray_" + temp.str();
+//     if(j<21) meFedETypeNErrArray_[j] = iBooker.bookInt(hid);
+//   }
+//   delete theHistogramId;
 //std::cout<<"...leaving SiPixelRawDataErrorModule::bookFED. "<<std::endl;
 }
 //
 // Fill histograms
 //
-int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>& input, bool modon, bool ladon, bool bladeon) {
-//std::cout<<"Entering SiPixelRawDataErrorModule::fill: "<<std::endl;
+int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>& input, std::map<std::string,MonitorElement**> *meMapFEDs, bool modon, bool ladon, bool bladeon) {
+  //  std::cout<<"Entering SiPixelRawDataErrorModule::fill: "<<std::endl;
   bool barrel = DetId(id_).subdetId() == static_cast<int>(PixelSubdetector::PixelBarrel);
   bool endcap = DetId(id_).subdetId() == static_cast<int>(PixelSubdetector::PixelEndcap);
   
@@ -172,6 +172,8 @@ int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>
       int FedId = di->getFedId();                  // FED the error came from
       int chanNmbr = 0;
       int errorType = di->getType();               // type of error
+      std::cout << "Fed number: " << FedId << " error type: " << errorType << std::endl;
+      
       int TBMType=-1; int TBMMessage=-1; int evtSize=-1; int evtNbr=-1; int fullType=-1;
       //bool notReset = true;
       const int LINK_bits = 6;
@@ -476,15 +478,13 @@ int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>
           char chNbuf[sizeof(chNfmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
           sprintf(chNbuf, chNfmt, FedId, chanNmbr);
           hid = chNbuf;
-          meFedChNErrArray_[chanNmbr] = theDMBE->get(hid);
-          if(meFedChNErrArray_[chanNmbr]) meFedChNErrArray_[chanNmbr]->Fill(meFedChNErrArray_[chanNmbr]->getIntValue()+1);
+          if((*meMapFEDs)["meFedChNErrArray_"][FedId*37 + chanNmbr]) (*meMapFEDs)["meFedChNErrArray_"][FedId*37 + chanNmbr]->Fill((*meMapFEDs)["meFedChNErrArray_"][FedId*37 + chanNmbr]->getIntValue()+1);
 
           static const char chLfmt[] = "Pixel/AdditionalPixelErrors/FED_%d/FedChLErrArray_%d";
           char chLbuf[sizeof(chLfmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
           sprintf(chLbuf, chLfmt, FedId, chanNmbr);
           hid = chLbuf;
-          meFedChLErrArray_[chanNmbr] = theDMBE->get(hid); 
-          if(meFedChLErrArray_[chanNmbr]) meFedChLErrArray_[chanNmbr]->Fill(errorType); 
+          if((*meMapFEDs)["meFedChLErrArray_"][FedId*37 + chanNmbr]) (*meMapFEDs)["meFedChLErrArray_"][FedId*37 + chanNmbr]->Fill(errorType); 
 
           numberOfSeriousErrors++;
           int messageType = 99;
@@ -502,8 +502,7 @@ int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>
             char buf[sizeof(fmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
             sprintf(buf, fmt, FedId, messageType);
             hid = buf;
-            meFedETypeNErrArray_[messageType] = theDMBE->get(hid); 
-            if(meFedETypeNErrArray_[messageType]) meFedETypeNErrArray_[messageType]->Fill(meFedETypeNErrArray_[messageType]->getIntValue()+1); 
+            if((*meMapFEDs)["meFedETypeNErrArray_"][FedId*21+messageType]) (*meMapFEDs)["meFedETypeNErrArray_"][FedId*21+messageType]->Fill((*meMapFEDs)["meFedETypeNErrArray_"][FedId*21+messageType]->getIntValue()+1); 
           }
 	}
 
@@ -552,7 +551,6 @@ int SiPixelRawDataErrorModule::fill(const edm::DetSetVector<SiPixelRawDataError>
       }
     }//end for loop over all errors on module
   }//end if not an empty iterator
-
   return numberOfSeriousErrors;
 }
 
@@ -692,15 +690,13 @@ int SiPixelRawDataErrorModule::fillFED(const edm::DetSetVector<SiPixelRawDataErr
             char chNbuf[sizeof(chNfmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
             sprintf(chNbuf, chNfmt, FedId, chanNmbr);
             hid = chNbuf;
-            meFedChNErrArray_[chanNmbr] = theDMBE->get(hid);
-            if(meFedChNErrArray_[chanNmbr]) meFedChNErrArray_[chanNmbr]->Fill(meFedChNErrArray_[chanNmbr]->getIntValue()+1);
+            if((*meMapFEDs)["meFedChNErrArray_"][id_*37 + chanNmbr]) (*meMapFEDs)["meFedChNErrArray_"][id_*37 + chanNmbr]->Fill((*meMapFEDs)["meFedChNErrArray_"][id_*37 + chanNmbr]->getIntValue()+1);
 
             static const char chLfmt[] = "Pixel/AdditionalPixelErrors/FED_%d/FedChLErrArray_%d";
             char chLbuf[sizeof(chLfmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
             sprintf(chLbuf, chLfmt, FedId, chanNmbr);
             hid = chLbuf;
-            meFedChLErrArray_[chanNmbr] = theDMBE->get(hid); 
-            if(meFedChLErrArray_[chanNmbr]) meFedChLErrArray_[chanNmbr]->Fill(errorType); 
+            if((*meMapFEDs)["meFedChLErrArray_"][id_*37 + chanNmbr]) (*meMapFEDs)["meFedChLErrArray_"][id_*37 + chanNmbr]->Fill(errorType); 
 
             numberOfSeriousErrors++;
             int messageType = 99;
@@ -718,8 +714,7 @@ int SiPixelRawDataErrorModule::fillFED(const edm::DetSetVector<SiPixelRawDataErr
               char buf[sizeof(fmt) + 2*32]; // 32 digits is enough for up to 2^105 + sign.
               sprintf(buf, fmt, FedId, messageType);
               hid = buf;
-              meFedETypeNErrArray_[messageType] = theDMBE->get(hid); 
-              if(meFedETypeNErrArray_[messageType]) meFedETypeNErrArray_[messageType]->Fill(meFedETypeNErrArray_[messageType]->getIntValue()+1);
+              if((*meMapFEDs)["meFedETypeNErrArray_"][id_*21 + messageType]) (*meMapFEDs)["meFedETypeNErrArray_"][id_+21 + messageType]->Fill((*meMapFEDs)["meFedETypeNErrArray_"][id_* 21 + messageType]->getIntValue()+1);
             }
 	  }//end if bad channel
         }//end if not 30 || notReset

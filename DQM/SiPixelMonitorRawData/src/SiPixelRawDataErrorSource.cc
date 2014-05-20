@@ -332,6 +332,73 @@ void SiPixelRawDataErrorSource::bookMEs(){
   }
   //cout<<"...leaving SiPixelRawDataErrorSource::bookMEs now! "<<endl;
 
+  //Putting in the actual FED booking stuff here, so that it can be accessed properly within the Module code properly. This is ugly and hard-codes the FEDs though, which is probably bad.
+  //It is hard-coded in build structure, so I think this is fine. ...
+
+  std::string hid;
+  // Get collection name and instantiate Histo Id builder
+  edm::InputTag src = conf_.getParameter<edm::InputTag>( "src" );
+  SiPixelHistogramId* theHistogramId = new SiPixelHistogramId( src.label() );
+
+  for (uint32_t id = 0; id < 40; id++){
+    char temp [50];
+    sprintf( temp, "Pixel/AdditionalPixelErrors/FED_%d",id);
+    iBooker.cd(temp);
+    // Types of errors
+    hid = theHistogramId->setHistoId("errorType",id);
+    meErrorType_[id] = iBooker.book1D(hid,"Type of errors",15,24.5,39.5);
+    meErrorType_[id]->setAxisTitle("Type of errors",1);
+    // Number of errors
+    hid = theHistogramId->setHistoId("NErrors",id);
+    meNErrors_[id] = iBooker.book1D(hid,"Number of errors",36,0.,36.);
+    meNErrors_[id]->setAxisTitle("Number of errors",1);
+    // Type of FIFO full (errorType = 28).  FIFO 1 is 1-5 (where fullType = channel of FIFO 1), 
+    // fullType = 6 signifies FIFO 2 nearly full, 7 signifies trigger FIFO nearly full, 8 
+    // indicates an unexpected result
+    hid = theHistogramId->setHistoId("fullType",id);
+    meFullType_[id] = iBooker.book1D(hid,"Type of FIFO full",7,0.5,7.5);
+    meFullType_[id]->setAxisTitle("FIFO type",1);
+    // For error type 30, the type of problem encoded in the TBM trailer
+    // 0 = stack full, 1 = Pre-cal issued, 2 = clear trigger counter, 3 = sync trigger, 
+    // 4 = sync trigger error, 5 = reset ROC, 6 = reset TBM, 7 = no token bit pass
+    hid = theHistogramId->setHistoId("TBMMessage",id);
+    meTBMMessage_[id] = iBooker.book1D(hid,"TBM trailer message",8,-0.5,7.5);
+    meTBMMessage_[id]->setAxisTitle("TBM message",1);
+    // For error type 30, the type of problem encoded in the TBM error trailer 0 = none
+    // 1 = data stream too long, 2 = FSM errors, 3 = invalid # of ROCs, 4 = multiple
+    hid = theHistogramId->setHistoId("TBMType",id);
+    meTBMType_[id] = iBooker.book1D(hid,"Type of TBM trailer",5,-0.5,4.5);
+    meTBMType_[id]->setAxisTitle("TBM Type",1);
+    // For error type 31, the event number of the TBM header with the error
+    hid = theHistogramId->setHistoId("EvtNbr",id);
+    meEvtNbr_[id] = iBooker.bookInt(hid);
+    // For errorType = 34, datastream size according to error word
+    hid = theHistogramId->setHistoId("evtSize",id);
+    meEvtSize_[id] = iBooker.bookInt(hid);
+    for(int j=0; j!=37; j++){
+      std::stringstream temp; temp << j;
+      hid = "FedChNErrArray_" + temp.str();
+      meFedChNErrArray_[id*37 + j] = iBooker.bookInt(hid);
+      hid = "FedChLErrArray_" + temp.str();
+      meFedChLErrArray_[id*37 + j] = iBooker.bookInt(hid);
+      hid = "FedETypeNErrArray_" + temp.str();
+      if(j<21) meFedETypeNErrArray_[id*21 + j] = iBooker.bookInt(hid);
+    }
+    
+    
+  }
+  delete theHistogramId;
+  meMapFEDs_["meErrorType_"] = meErrorType_;
+  meMapFEDs_["meNErrors_"] = meNErrors_;
+  meMapFEDs_["meFullType_"] = meFullType_;
+  meMapFEDs_["meTBMMessage_"] = meTBMMessage_;
+  meMapFEDs_["meTBMType_"] = meTBMType_;
+  meMapFEDs_["meEvtNbr_"] = meEvtNbr_;
+  meMapFEDs_["meEvtSize_"] = meEvtSize_;
+  meMapFEDs_["meFedChNErrArray_"] = meFedChNErrArray_;
+  meMapFEDs_["meFedChLErrArray_"] = meFedChLErrArray_;
+  meMapFEDs_["meFedETypeNErrArray_"] = meFedETypeNErrArray_;
+
 }
 
 DEFINE_FWK_MODULE(SiPixelRawDataErrorSource);

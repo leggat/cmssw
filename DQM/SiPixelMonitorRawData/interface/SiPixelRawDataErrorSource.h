@@ -82,7 +82,21 @@
        bool firstRun;
        MonitorElement* byLumiErrors; 
        MonitorElement* errorRate;
-       
+
+       MonitorElement* meErrorType_[40];
+       MonitorElement* meNErrors_[40];
+       MonitorElement* meFullType_[40];
+       MonitorElement* meTBMMessage_[40];
+       MonitorElement* meTBMType_[40];
+       MonitorElement* meEvtNbr_[40];
+       MonitorElement* meEvtSize_[40];
+
+       MonitorElement* meFedChNErrArray_[1480];
+       MonitorElement* meFedChLErrArray_[1480];
+       MonitorElement* meFedETypeNErrArray_[840];
+
+       std::map<std::string,MonitorElement**> meMapFEDs_;
+              
  };
 
 #endif
