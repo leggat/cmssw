@@ -62,6 +62,8 @@ from DQM.SiPixelPhase1Clusters.SiPixelPhase1Clusters_cfi import *
 # Raw data errors
 from DQM.SiPixelPhase1RawData.SiPixelPhase1RawData_cfi import *
 
+from DQM.SiPixelPhase1Summary.SiPixelPhase1Summary_cfi import *
+
 PerModule.enabled = True
 
 siPixelPhase1OnlineDQM_source = cms.Sequence(SiPixelPhase1DigisAnalyzer
@@ -72,4 +74,5 @@ siPixelPhase1OnlineDQM_source = cms.Sequence(SiPixelPhase1DigisAnalyzer
 siPixelPhase1OnlineDQM_harvesting = cms.Sequence(SiPixelPhase1DigisHarvester 
                                                 + SiPixelPhase1ClustersHarvester
                                                 + SiPixelPhase1RawDataHarvester
+                                                + SiPixelPhase1Summary
                                                 )
