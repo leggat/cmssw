@@ -60,7 +60,13 @@ SiPixelPhase1Summary::SiPixelPhase1Summary(const edm::ParameterSet& iConfig) :
 
    //Go through the configuration file and add in 
    for (auto const mapPSet : mapPSets){
-     summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     if (mapPSet.getParameter<bool>("perLayerRing")){
+       perLayerRingSummaryName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     }
+     else {
+       summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     }
+     allSummaryPlotNames_.append(mapPSet.getParameter<std::string>("MapName"));
    }
 
 }
