@@ -66,7 +66,7 @@ SiPixelPhase1Summary::SiPixelPhase1Summary(const edm::ParameterSet& iConfig) :
      else {
        summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
      }
-     allSummaryPlotNames_.append(mapPSet.getParameter<std::string>("MapName"));
+     allSummaryPlotNames_.push_back(mapPSet.getParameter<std::string>("MapName"));
    }
 
 }
