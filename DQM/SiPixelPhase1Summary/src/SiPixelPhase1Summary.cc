@@ -127,8 +127,7 @@ void SiPixelPhase1Summary::bookSummaries(DQMStore::IBooker & iBooker){
   
   iBooker.setCurrentFolder("PixelPhase1/Summary");
   //Book the summary plots for the variables as described in the config file  
-  for (auto mapInfo: summaryPlotName_){
-    auto name = mapInfo.first;
+  for (auto name: allSummaryPlotNames_){
     summaryMap_[name] = iBooker.book2D("pixel"+name+"Summary","Pixel "+name+" Summary",12,0,12,4,0,4);
   }
   //Now book the overall summary map
@@ -197,7 +196,7 @@ void SiPixelPhase1Summary::bookTrendPlots(DQMStore::IBooker & iBooker){
 //------------------------------------------------------------------
 void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::IGetter & iGetter){
   //Firstly, we will fill the regular summary maps.
-  for (auto mapInfo: summaryPlotName_){
+  for (auto mapInfo: summaryMap_){
     auto name = mapInfo.first;
     std::ostringstream histNameStream;
     std::string histName;
@@ -205,29 +204,40 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
     for (int i = 0; i < 12; i++){ // !??!?!? xAxisLabels_.size() ?!?!
       for (int j = 0; j < 4; j++){ // !??!?!? yAxisLabels_.size() ?!?!?!
 	if (i > 3 && j == 3) continue;
-	bool minus = i < 2  || (i > 3 && i < 8); // bleah !
-	int iOver2 = floor(i/2.);
-	bool outer = (i > 3)?iOver2%2==0:i%2==0;
-	//Complicated expression that creates the name of the histogram we are interested in.
-	histNameStream.str("");
-	histNameStream << topFolderName_.c_str() << "PX" << ((i > 3)?"Forward":"Barrel") << "/" << ((i > 3)?"HalfCylinder":"Shell") << "_" << (minus?"m":"p") << ((outer)?"O":"I") << "/" << ((i > 3)?((i%2 == 0)?"PXRing_1/":"PXRing_2/"):"") << summaryPlotName_[name].c_str() << "_PX" << ((i > 3)?"Disk":"Layer") << "_" << ((i>3)?((minus)?"-":"+"):"") << (j+1);
+	if (summaryPlotName_.find(name) != summaryPlotName_.end()){
+	  bool minus = i < 2  || (i > 3 && i < 8); // bleah !
+	  int iOver2 = floor(i/2.);
+	  bool outer = (i > 3)?iOver2%2==0:i%2==0;
+	  //Complicated expression that creates the name of the histogram we are interested in.
+	  histNameStream.str("");
+	  histNameStream << topFolderName_.c_str() << "Phase1_MechanicalView/PX" << ((i > 3)?"Forward":"Barrel") << "/" << ((i > 3)?"HalfCylinder":"Shell") << "_" << (minus?"m":"p") << ((outer)?"O":"I") << "/" << ((i > 3)?((i%2 == 0)?"PXRing_1/":"PXRing_2/"):"") << summaryPlotName_[name].c_str() << "_PX" << ((i > 3)?"Disk":"Layer") << "_" << ((i>3)?((minus)?"-":"+"):"") << (j+1);
+	}
+	else if (perLayerRingSummaryName_.find(name) != perLayerRingSummaryName_.end()){
+	  histNameStream.str("");
+	  histNameStream << topFolderName_.c_str() << perLayerRingSummaryName_[name] << ((i>3)?"Ring_":"Layer_") << ((i<=3)?j+1:((i%2 == 0)?1:2));
+	}
+	else {
+	  edm::LogWarning("SiPixelPhase1Summary") << name << " not found in summary map definitions!!"; 
+	  continue;
+	}
 	histName = histNameStream.str();
 	MonitorElement * me = iGetter.get(histName);
-
+	
 	if (!me) {
 	  edm::LogWarning("SiPixelPhase1Summary") << "ME " << histName << " is not available !!";
 	  continue; // Ignore non-existing MEs, as this can cause the whole thing to crash
 	}
-
+	
 	if (summaryMap_[name]==nullptr){
 	  edm::LogWarning("SiPixelPhase1Summary") << "Summary map " << name << " is not available !!";
 	  continue; // Based on reported errors it seems possible that we're trying to access a non-existant summary map, so if the map doesn't exist but we're trying to access it here we'll skip it instead.
 	}
 	if ((me->getQReports()).size()!=0) summaryMap_[name]->setBinContent(i+1,j+1,(me->getQReports())[0]->getQTresult());
 	else summaryMap_[name]->setBinContent(i+1,j+1,-1);
-      }  
+      } // end if name in summaryPlotName
     }    
   }
+  
   //Sum of non-negative bins for the reportSummary
   float sumOfNonNegBins = 0.;
   //Now we will use the other summary maps to create the overall map.
