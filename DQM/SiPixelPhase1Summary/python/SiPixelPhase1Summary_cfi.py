@@ -6,7 +6,7 @@ from DQMServices.Core.DQMEDHarvester import DQMEDHarvester
 #
 
 SiPixelPhase1SummaryOnline = DQMEDHarvester("SiPixelPhase1Summary",
-    TopFolderName = cms.string('PixelPhase1/Phase1_MechanicalView/'),
+    TopFolderName = cms.string('PixelPhase1/'),
     RunOnEndLumi = cms.bool(True),
     RunOnEndJob = cms.bool(True),
     SummaryMaps = cms.VPSet(
@@ -39,11 +39,12 @@ SiPixelPhase1SummaryOnline = DQMEDHarvester("SiPixelPhase1Summary",
             MapName = cms.string("DeadROCs"),
             MapHist = cms.string("deadRocTrend"),
             perLayerRing = cms.bool(True)
+            )
         )
 )
 
 SiPixelPhase1SummaryOffline = DQMEDHarvester("SiPixelPhase1Summary",
-    TopFolderName = cms.string('PixelPhase1/Phase1_MechanicalView/'),
+    TopFolderName = cms.string('PixelPhase1/'),
     RunOnEndLumi = cms.bool(False),
     RunOnEndJob = cms.bool(True),
     SummaryMaps = cms.VPSet(
@@ -76,7 +77,7 @@ SiPixelPhase1SummaryOffline = DQMEDHarvester("SiPixelPhase1Summary",
 )
 
 SiPixelPhase1SummaryCosmics = DQMEDHarvester("SiPixelPhase1Summary",
-    TopFolderName = cms.string('PixelPhase1/Phase1_MechanicalView/'),
+    TopFolderName = cms.string('PixelPhase1/'),
     RunOnEndLumi = cms.bool(False),
     RunOnEndJob = cms.bool(True),
     SummaryMaps = cms.VPSet(
@@ -215,7 +216,7 @@ ChargeQTester_cosmics = cms.EDAnalyzer("QualityTester",
     reportThreshold = cms.untracked.string("more")
 )
 
-ROCTrendQTester = cms.EDAnalyzer("QualityTest",
+ROCTrendQTester = cms.EDAnalyzer("QualityTester",
     qtList = cms.untracked.FileInPath('DQM/SiPixelPhase1Config/test/qTests/dead_roc_qualitytest_config.xml'),
     QualityTestPrescaler = cms.untracked.int32(1),
     getQualityTestsFromFile = cms.untracked.bool(True),
