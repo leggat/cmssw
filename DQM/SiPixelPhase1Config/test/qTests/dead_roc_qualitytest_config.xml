@@ -8,7 +8,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1.</PARAM>
         <PARAM name="ymax">1469.</PARAM>  <!-- 1536 -->
       </QTEST>
       <!-- PXLAYER 2 -->
@@ -17,7 +17,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1.</PARAM>
         <PARAM name="ymax">3404.</PARAM>  <!-- 3584 -->
       </QTEST>
       <!-- PXLAYER 3 -->
@@ -26,7 +26,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1.</PARAM>
         <PARAM name="ymax">5350.</PARAM>  <!-- 5632 -->
       </QTEST>
       <!-- PXLAYER 4 -->
@@ -35,7 +35,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1.</PARAM>
         <PARAM name="ymax">7782.</PARAM>  <!-- 8192 -->
       </QTEST>
 
@@ -46,7 +46,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1.</PARAM>
         <PARAM name="ymax">4202.</PARAM>  <!-- 4224 -->
       </QTEST>
       <!-- PXRING 1 -->
@@ -55,7 +55,7 @@
         <PARAM name="useEmptyBins">1</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
-        <PARAM name="ymin">0.</PARAM>
+        <PARAM name="ymin">1. </PARAM>
         <PARAM name="ymax">6201.</PARAM>  <!-- 6528 -->
       </QTEST>
 
