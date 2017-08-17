@@ -4,7 +4,7 @@ from Configuration.StandardSequences.Eras import eras
 
 process = cms.Process("PIXELDQMLIVE", eras.Run2_2017)
 
-live=True  #set to false for lxplus offline testing
+live=False  #set to false for lxplus offline testing
 offlineTesting=not live
 
 TAG ="PixelPhase1" 
@@ -71,14 +71,14 @@ process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 #-------------------------------------------------
 # Condition for P5 cluster
 
-if (live):
-    process.load("DQM.Integration.config.FrontierCondition_GT_cfi")
+#if (live):
+process.load("DQM.Integration.config.FrontierCondition_GT_cfi")
 
 # Condition for lxplus: change and possibly customise the GT
-elif(offlineTesting):
-    process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-    from Configuration.AlCa.GlobalTag import GlobalTag as gtCustomise
-    process.GlobalTag = gtCustomise(process.GlobalTag, 'auto:run2_data', '')
+#elif(offlineTesting):
+#    process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+#    from Configuration.AlCa.GlobalTag import GlobalTag as gtCustomise
+#    process.GlobalTag = gtCustomise(process.GlobalTag, 'auto:run2_data', '')
 
 #-----------------------
 #  Reconstruction Modules
@@ -131,6 +131,8 @@ process.load('HLTrigger.HLTfilters.hltHighLevel_cfi')
 process.hltHighLevel.HLTPaths = cms.vstring( 'HLT_ZeroBias_*' , 'HLT_ZeroBias1_*' , 'HLT_PAZeroBias_*' , 'HLT_PAZeroBias1_*', 'HLT_PAL1MinimumBiasHF_OR_SinglePixelTrack_*', 'HLT*SingleMu*')
 process.hltHighLevel.andOr = cms.bool(True)
 process.hltHighLevel.throw =  cms.bool(False)
+#process.hltHighLevel.dcsPartitions = cms.vint32( 28, 29 )
+#process.hltHighLevel.andOrDcs = cms.bool(False)
 
 #--------------------------
 # Scheduling
