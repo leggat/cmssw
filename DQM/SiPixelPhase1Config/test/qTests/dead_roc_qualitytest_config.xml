@@ -5,7 +5,7 @@
       <!-- PXLAYER 1 -->
       <QTEST name="Yrange:PXLayer_1:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1.</PARAM>
@@ -14,7 +14,7 @@
       <!-- PXLAYER 2 -->
       <QTEST name="Yrange:PXLayer_2:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1.</PARAM>
@@ -23,7 +23,7 @@
       <!-- PXLAYER 3 -->
       <QTEST name="Yrange:PXLayer_3:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1.</PARAM>
@@ -32,7 +32,7 @@
       <!-- PXLAYER 4 -->
       <QTEST name="Yrange:PXLayer_4:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1.</PARAM>
@@ -43,7 +43,7 @@
       <!-- PXRING 1 -->
       <QTEST name="Yrange:PXRing_1:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1.</PARAM>
@@ -52,7 +52,7 @@
       <!-- PXRING 1 -->
       <QTEST name="Yrange:PXRing_2:dead_roc" activate="true">
         <TYPE>ContentsYRange</TYPE>
-        <PARAM name="useEmptyBins">1</PARAM>
+        <PARAM name="useEmptyBins">0</PARAM>
         <PARAM name="error">1.00</PARAM>
         <PARAM name="warning">1.00</PARAM>
         <PARAM name="ymin">1. </PARAM>
