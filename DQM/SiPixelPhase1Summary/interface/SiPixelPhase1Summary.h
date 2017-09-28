@@ -70,7 +70,10 @@
        std::map<std::string,MonitorElement*> summaryMap_;
        MonitorElement * reportSummary; //Float value of the average of the ins in the grand summary
 
-       std::map<std::string,std::string> summaryPlotName_;
+       std::map<std::string,std::string> summaryPlotName_; //Summary plots to be filled per layer per region in the detector
+       std::map<std::string,std::string> perLayerRingSummaryName_; //The names of summary plots to be filled only once per layer/ring.
+
+       std::vector<std::string> allSummaryPlotNames_;
 
        //The dead and innefficient roc trend plot
        std::map<trendPlots,MonitorElement*>  deadROCTrends_;

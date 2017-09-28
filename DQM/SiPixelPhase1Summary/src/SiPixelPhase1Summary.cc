@@ -60,7 +60,13 @@ SiPixelPhase1Summary::SiPixelPhase1Summary(const edm::ParameterSet& iConfig) :
 
    //Go through the configuration file and add in 
    for (auto const mapPSet : mapPSets){
-     summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     if (mapPSet.getParameter<bool>("perLayerRing")){
+       perLayerRingSummaryName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     }
+     else {
+       summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
+     }
+     allSummaryPlotNames_.push_back(mapPSet.getParameter<std::string>("MapName"));
    }
 
 }
@@ -121,8 +127,7 @@ void SiPixelPhase1Summary::bookSummaries(DQMStore::IBooker & iBooker){
   
   iBooker.setCurrentFolder("PixelPhase1/Summary");
   //Book the summary plots for the variables as described in the config file  
-  for (auto mapInfo: summaryPlotName_){
-    auto name = mapInfo.first;
+  for (auto name: allSummaryPlotNames_){
     summaryMap_[name] = iBooker.book2D("pixel"+name+"Summary","Pixel "+name+" Summary",12,0,12,4,0,4);
   }
   //Now book the overall summary map
@@ -191,7 +196,7 @@ void SiPixelPhase1Summary::bookTrendPlots(DQMStore::IBooker & iBooker){
 //------------------------------------------------------------------
 void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::IGetter & iGetter){
   //Firstly, we will fill the regular summary maps.
-  for (auto mapInfo: summaryPlotName_){
+  for (auto mapInfo: summaryMap_){
     auto name = mapInfo.first;
     std::ostringstream histNameStream;
     std::string histName;
@@ -199,34 +204,45 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
     for (int i = 0; i < 12; i++){ // !??!?!? xAxisLabels_.size() ?!?!
       for (int j = 0; j < 4; j++){ // !??!?!? yAxisLabels_.size() ?!?!?!
 	if (i > 3 && j == 3) continue;
-	bool minus = i < 2  || (i > 3 && i < 8); // bleah !
-	int iOver2 = floor(i/2.);
-	bool outer = (i > 3)?iOver2%2==0:i%2==0;
-	//Complicated expression that creates the name of the histogram we are interested in.
-	histNameStream.str("");
-	histNameStream << topFolderName_.c_str() << "PX" << ((i > 3)?"Forward":"Barrel") << "/" << ((i > 3)?"HalfCylinder":"Shell") << "_" << (minus?"m":"p") << ((outer)?"O":"I") << "/" << ((i > 3)?((i%2 == 0)?"PXRing_1/":"PXRing_2/"):"") << summaryPlotName_[name].c_str() << "_PX" << ((i > 3)?"Disk":"Layer") << "_" << ((i>3)?((minus)?"-":"+"):"") << (j+1);
+	if (summaryPlotName_.find(name) != summaryPlotName_.end()){
+	  bool minus = i < 2  || (i > 3 && i < 8); // bleah !
+	  int iOver2 = floor(i/2.);
+	  bool outer = (i > 3)?iOver2%2==0:i%2==0;
+	  //Complicated expression that creates the name of the histogram we are interested in.
+	  histNameStream.str("");
+	  histNameStream << topFolderName_.c_str() << "Phase1_MechanicalView/PX" << ((i > 3)?"Forward":"Barrel") << "/" << ((i > 3)?"HalfCylinder":"Shell") << "_" << (minus?"m":"p") << ((outer)?"O":"I") << "/" << ((i > 3)?((i%2 == 0)?"PXRing_1/":"PXRing_2/"):"") << summaryPlotName_[name].c_str() << "_PX" << ((i > 3)?"Disk":"Layer") << "_" << ((i>3)?((minus)?"-":"+"):"") << (j+1);
+	}
+	else if (perLayerRingSummaryName_.find(name) != perLayerRingSummaryName_.end()){
+	  histNameStream.str("");
+	  histNameStream << topFolderName_.c_str() << perLayerRingSummaryName_[name] << ((i>3)?"Ring_":"Layer_") << ((i<=3)?j+1:((i%2 == 0)?1:2));
+	}
+	else {
+	  edm::LogWarning("SiPixelPhase1Summary") << name << " not found in summary map definitions!!"; 
+	  continue;
+	}
 	histName = histNameStream.str();
 	MonitorElement * me = iGetter.get(histName);
-
+	
 	if (!me) {
 	  edm::LogWarning("SiPixelPhase1Summary") << "ME " << histName << " is not available !!";
 	  continue; // Ignore non-existing MEs, as this can cause the whole thing to crash
 	}
-
-	if (!summaryMap_[name]){
+	
+	if (summaryMap_[name]==nullptr){
 	  edm::LogWarning("SiPixelPhase1Summary") << "Summary map " << name << " is not available !!";
 	  continue; // Based on reported errors it seems possible that we're trying to access a non-existant summary map, so if the map doesn't exist but we're trying to access it here we'll skip it instead.
 	}
 	if ((me->getQReports()).size()!=0) summaryMap_[name]->setBinContent(i+1,j+1,(me->getQReports())[0]->getQTresult());
 	else summaryMap_[name]->setBinContent(i+1,j+1,-1);
-      }  
+      } // end if name in summaryPlotName
     }    
   }
+  
   //Sum of non-negative bins for the reportSummary
   float sumOfNonNegBins = 0.;
   //Now we will use the other summary maps to create the overall map.
   for (int i = 0; i < 12; i++){ // !??!?!? xAxisLabels_.size() ?!?!
-    if (!summaryMap_["Grand"]){
+    if (summaryMap_["Grand"]==nullptr){
       edm::LogWarning("SiPixelPhase1Summary") << "Grand summary does not exist!";
       break;
     }
@@ -234,7 +250,7 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
       summaryMap_["Grand"]->setBinContent(i+1,j+1,1); // This resets the map to be good. We only then set it to 0 if there has been a problem in one of the other summaries.
       for (auto const mapInfo: summaryPlotName_){ //Check summary maps
 	auto name = mapInfo.first;
-	if (!summaryMap_[name]){
+	if (summaryMap_[name]==nullptr){
 	  edm::LogWarning("SiPixelPhase1Summary") << "Summary " << name << " does not exist!";
 	  continue;
 	}
@@ -255,7 +271,6 @@ void SiPixelPhase1Summary::fillTrendPlots(DQMStore::IBooker & iBooker, DQMStore:
   // If we're running in online mode and the lumi section is not modulo 10, return. Offline running always uses lumiSec=0, so it will pass this test.
   if (lumiSec%10 != 0) return;
 
-  std::ostringstream histNameStream;
   std::string histName;
   
 
@@ -265,27 +280,21 @@ void SiPixelPhase1Summary::fillTrendPlots(DQMStore::IBooker & iBooker, DQMStore:
   std::vector<int> hiEffROCs(trendOrder.size(),0);
   std::vector<int> nRocsPerTrend = {1536,3584,5632,8192,4224,6528};
   std::vector<string> trendNames = {};
-  string name = "";
+
   for (auto it : {1,2,3,4}) {
-    histNameStream.str("");
-    histNameStream << "PXBarrel/digi_occupancy_per_SignedModuleCoord_per_SignedLadderCoord_PXLayer_" << it;
-    histName = histNameStream.str();
+    histName = "PXBarrel/digi_occupancy_per_SignedModuleCoord_per_SignedLadderCoord_PXLayer_" + std::to_string(it);
     trendNames.push_back(histName);
   }
   for (auto it : {1,2}) {
-    histNameStream.str("");
-    histNameStream << "PXForward/digi_occupancy_per_SignedDiskCoord_per_SignedBladePanelCoord_PXRing_" << it;;
-    histName = histNameStream.str();
+    histName = "PXForward/digi_occupancy_per_SignedDiskCoord_per_SignedBladePanelCoord_PXRing_" + std::to_string(it);
     trendNames.push_back(histName);
   }
   //Loop over layers. This will also do the rings, but we'll skip the ring calculation for 
   for (unsigned int trendIt = 0; trendIt < trendOrder.size(); trendIt++){
     iGetter.cd();
-    histNameStream.str("");
-    histNameStream << "PixelPhase1/Phase1_MechanicalView/" << trendNames[trendIt];
-    histName = histNameStream.str();
+    histName = "PixelPhase1/Phase1_MechanicalView/" + trendNames[trendIt];
     MonitorElement * tempLayerME = iGetter.get(histName);
-    if (!tempLayerME) continue;
+    if (tempLayerME==nullptr) continue;
     float lowEffValue = 0.25 * (tempLayerME->getTH1()->Integral() / nRocsPerTrend[trendIt]);
     for (int i=1; i<=tempLayerME->getTH1()->GetXaxis()->GetNbins(); i++){
       for (int j=1; j<=tempLayerME->getTH1()->GetYaxis()->GetNbins(); j++){
@@ -308,6 +317,23 @@ void SiPixelPhase1Summary::fillTrendPlots(DQMStore::IBooker & iBooker, DQMStore:
     for (unsigned int i = 0; i < trendOrder.size(); i++){
       deadROCTrends_[trendOrder[i]]->setBinContent(lumiSec/10,nRocsPerTrend[i]-nFilledROCs[i]);
       ineffROCTrends_[trendOrder[i]]->setBinContent(lumiSec/10,nFilledROCs[i]-hiEffROCs[i]);
+    }
+  }
+
+  if (!runOnEndLumi_) return; // The following only occurs in the online
+  //Reset some MEs every 10LS here
+  for (auto it : {1,2,3,4}) { //PXBarrel
+    histName = "PixelPhase1/Phase1_MechanicalView/PXBarrel/clusterposition_zphi_PXLayer_" +std::to_string(it);
+    MonitorElement * toReset = iGetter.get(histName);
+    if (toReset!=nullptr) {
+      toReset->Reset();
+    }
+  }
+  for (auto it : {-3,-2,-1,1,2,3}){ //PXForward
+    histName = "PixelPhase1/Phase1_MechanicalView/PXForward/clusterposition_xy_PXDisk_" + std::to_string(it);
+    MonitorElement * toReset = iGetter.get(histName);
+    if (toReset!=nullptr) {
+      toReset->Reset();
     }
   }
 
