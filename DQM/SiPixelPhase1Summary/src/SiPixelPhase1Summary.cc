@@ -125,6 +125,9 @@ void SiPixelPhase1Summary::bookSummaries(DQMStore::IBooker & iBooker){
     auto name = mapInfo.first;
     summaryMap_[name] = iBooker.book2D("pixel"+name+"Summary","Pixel "+name+" Summary",12,0,12,4,0,4);
   }
+  //Book the roc trend summary map
+  summaryMap_["rocs"] = iBooker.book2D("pixelROCSummary","Pixel ROC Summary",12,0,12,4,0,4);  
+  
   //Now book the overall summary map
   iBooker.setCurrentFolder("PixelPhase1/EventInfo");
   summaryMap_["Grand"] = iBooker.book2D("reportSummaryMap","Pixel Summary Map",12,0,12,4,0,4);
@@ -223,6 +226,32 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
       }  
     }    
   }
+  // go through the bins of the roc summary map
+  std::string histPostfix;
+  int nThreshold;
+  std::vector<float> layerThreshold = {0.15*1536,0.15*3584,0.15*5632,0.15*8192,0.2*4224,0.2*6528};
+  std::vector<trendPlots> trendOrder = {layer1,layer2,layer3,layer4,ring1,ring2};
+  for (int i = 0; i < 12; i++){
+    for (int j = 0; j < 4; j++){
+      if (i > 3 && j == 3) continue;
+      if (i > 3) {
+	if (i%2 == 0){
+	  nThreshold = 4;
+	}
+	else{
+	  nThreshold = 5;
+	}
+      }
+      else {
+	nThreshold = j;
+      }
+      TH1F * tempProfile = deadROCTrends_[trendOrder[nThreshold]]->getTH1F();
+      if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold[nThreshold]){
+	summaryMap_["rocs"]->setBinContent(i+1,j+1,0.);
+      }
+      else summaryMap_["rocs"]->setBinContent(i+1,j+1,1.);
+    }
+  }
   //Sum of non-negative bins for the reportSummary
   float sumOfNonNegBins = 0.;
   //Now we will use the other summary maps to create the overall map.
@@ -233,13 +262,14 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
     }
     for (int j = 0; j < 4; j++){ // !??!?!? yAxisLabels_.size() ?!?!?!
       summaryMap_["Grand"]->setBinContent(i+1,j+1,1); // This resets the map to be good. We only then set it to 0 if there has been a problem in one of the other summaries.
-      for (auto const mapInfo: summaryPlotName_){ //Check summary maps
+      for (auto const mapInfo: summaryMap_){ //Check summary maps
 	auto name = mapInfo.first;
+	if (name == "Grand") continue;
 	if (summaryMap_[name]==nullptr){
 	  edm::LogWarning("SiPixelPhase1Summary") << "Summary " << name << " does not exist!";
 	  continue;
 	}
-	if (summaryMap_["Grand"]->getBinContent(i+1,j+1) > summaryMap_[name]->getBinContent(i+1,j+1)) summaryMap_["Grand"]->setBinContent(i+1,j+1,summaryMap_[name]->getBinContent(i+1,j+1));
+	if (summaryMap_["Grand"]->getBinContent(i+1,j+1) > mapInfo.second->getBinContent(i+1,j+1)) summaryMap_["Grand"]->setBinContent(i+1,j+1,mapInfo.second->getBinContent(i+1,j+1));
       }
       if (summaryMap_["Grand"]->getBinContent(i+1,j+1) > -0.1) sumOfNonNegBins += summaryMap_["Grand"]->getBinContent(i+1,j+1);
     }
