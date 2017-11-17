@@ -245,7 +245,7 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
       else {
 	nThreshold = j;
       }
-      TH1F * tempProfile = deadROCTrends_[trendOrder[nThreshold]]->getTH1F();
+      TH1 * tempProfile = deadROCTrends_[trendOrder[nThreshold]]->getTH1();
       if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold[nThreshold]){
 	summaryMap_["rocs"]->setBinContent(i+1,j+1,0.);
       }
