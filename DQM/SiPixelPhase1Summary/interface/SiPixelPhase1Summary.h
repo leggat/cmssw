@@ -75,6 +75,9 @@
        //The dead and innefficient roc trend plot
        std::map<trendPlots,MonitorElement*>  deadROCTrends_;
        std::map<trendPlots,MonitorElement*> ineffROCTrends_;
+       
+       //A vector for the layer threholds for the dead ROC summary map. Set in the configuration file.
+       std::vector<int> layerThreshold_;
 
        //book the summary plots
        void bookSummaries(DQMStore::IBooker & iBooker);

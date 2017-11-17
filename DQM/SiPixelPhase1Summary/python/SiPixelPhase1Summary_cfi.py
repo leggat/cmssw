@@ -30,7 +30,8 @@ SiPixelPhase1SummaryOnline = DQMEDHarvester("SiPixelPhase1Summary",
             MapName = cms.string("Charge"),
             MapHist = cms.string("mean_charge")
             )
-        )
+        ),
+    deadROCThresholds = cms.vint32(230,538,845,1229,845,1306) #The thresholda doe the dead ROC trend plot summary map. Order is layers 1-4, ring1, ring2.
 )
 
 SiPixelPhase1SummaryOffline = DQMEDHarvester("SiPixelPhase1Summary",
@@ -58,7 +59,8 @@ SiPixelPhase1SummaryOffline = DQMEDHarvester("SiPixelPhase1Summary",
             MapName = cms.string("Charge"),
             MapHist = cms.string("mean_charge")
             )
-        )
+        ),
+    deadROCThresholds = cms.vint32(230,538,845,1229,845,1306) #The thresholda doe the dead ROC trend plot summary map. Order is layers 1-4, ring1, ring2.
 )
 
 SiPixelPhase1SummaryCosmics = DQMEDHarvester("SiPixelPhase1Summary",
@@ -78,7 +80,8 @@ SiPixelPhase1SummaryCosmics = DQMEDHarvester("SiPixelPhase1Summary",
             MapName = cms.string("Charge"),
             MapHist = cms.string("mean_charge")
             )
-        )
+        ),
+    deadROCThresholds = cms.vint32(230,538,845,1229,845,1306) #The thresholda doe the dead ROC trend plot summary map. Order is layers 1-4, ring1, ring2. Probably actually need bigger numbers for the cosmics?
 )
 
 ADCQTester = cms.EDAnalyzer("QualityTester",
