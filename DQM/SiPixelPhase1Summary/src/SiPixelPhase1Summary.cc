@@ -62,6 +62,8 @@ SiPixelPhase1Summary::SiPixelPhase1Summary(const edm::ParameterSet& iConfig) :
    for (auto const mapPSet : mapPSets){
      summaryPlotName_[mapPSet.getParameter<std::string>("MapName")] = mapPSet.getParameter<std::string>("MapHist");
    }
+   
+   layerThreshold_ = conf_.getParameter<std::vector<int> >("deadROCThresholds");
 
 }
 
@@ -229,7 +231,7 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
   // go through the bins of the roc summary map
   std::string histPostfix;
   int nThreshold;
-  std::vector<float> layerThreshold = {0.15*1536,0.15*3584,0.15*5632,0.15*8192,0.2*4224,0.2*6528};
+  //  std::vector<float> layerThreshold = {0.15*1536,0.15*3584,0.15*5632,0.15*8192,0.2*4224,0.2*6528};
   std::vector<trendPlots> trendOrder = {layer1,layer2,layer3,layer4,ring1,ring2};
   for (int i = 0; i < 12; i++){
     for (int j = 0; j < 4; j++){
@@ -245,8 +247,9 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
       else {
 	nThreshold = j;
       }
+      std::cout << nThreshold << " " << trendOrder[nThreshold] << " " << " " << deadROCTrends_[trendOrder[nThreshold]] << " " << i << " " << j << std::endl;
       TH1F * tempProfile = deadROCTrends_[trendOrder[nThreshold]]->getTH1F();
-      if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold[nThreshold]){
+      if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold_[nThreshold]){
 	summaryMap_["rocs"]->setBinContent(i+1,j+1,0.);
       }
       else summaryMap_["rocs"]->setBinContent(i+1,j+1,1.);
