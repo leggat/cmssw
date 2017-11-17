@@ -231,11 +231,14 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
   // go through the bins of the roc summary map
   std::string histPostfix;
   int nThreshold;
-  //  std::vector<float> layerThreshold = {0.15*1536,0.15*3584,0.15*5632,0.15*8192,0.2*4224,0.2*6528};
   std::vector<trendPlots> trendOrder = {layer1,layer2,layer3,layer4,ring1,ring2};
   for (int i = 0; i < 12; i++){
     for (int j = 0; j < 4; j++){
       if (i > 3 && j == 3) continue;
+      if (!runOnEndLumi_){ //i.e. we're in the offline
+	summaryMap_["rocs"]->setBinContent(i+1,j+1,1.); //Just set it to one for now. Possibly change this later on?
+	continue;
+      }
       if (i > 3) {
 	if (i%2 == 0){
 	  nThreshold = 4;
@@ -248,7 +251,7 @@ void SiPixelPhase1Summary::fillSummaries(DQMStore::IBooker & iBooker, DQMStore::
 	nThreshold = j;
       }
       TH1 * tempProfile = deadROCTrends_[trendOrder[nThreshold]]->getTH1();
-      if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold[nThreshold]){
+      if (tempProfile->GetBinContent(tempProfile->FindLastBinAbove()) > layerThreshold_[nThreshold]){
 	summaryMap_["rocs"]->setBinContent(i+1,j+1,0.);
       }
       else summaryMap_["rocs"]->setBinContent(i+1,j+1,1.);
