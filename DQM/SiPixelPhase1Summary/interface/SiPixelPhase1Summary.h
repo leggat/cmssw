@@ -75,6 +75,9 @@
        //The dead and innefficient roc trend plot
        std::map<trendPlots,MonitorElement*>  deadROCTrends_;
        std::map<trendPlots,MonitorElement*> ineffROCTrends_;
+       
+       //Additional monitor elements for specific monitoring
+       MonitorElement * normalisedFEDDigis_;
 
        //book the summary plots
        void bookSummaries(DQMStore::IBooker & iBooker);

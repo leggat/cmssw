@@ -173,6 +173,10 @@ void SiPixelPhase1Summary::bookTrendPlots(DQMStore::IBooker & iBooker){
       deadROCTrends_[histoOrder[i]]->setAxisTitle("Lumisection",1);
       ineffROCTrends_[histoOrder[i]]->setAxisTitle("Lumisection",1);
     }
+    // Create normalised FED digi trend
+    normalisedFEDDigis_ = iBooker.book2D("normalisedFEDDigisTrend","Normalised FED digi trend",500,0.,5000.,139,1199.5,1338.5);
+    normalisedFEDDigis_->setAxisTitle("Lumisection",1);
+    normalisedFEDDigis_->setAxisTitle("FED",2);
   }
   else {
     deadROCTrends_[offline] = iBooker.book1D("deadRocTotal","N dead ROCs",6,0,6);
@@ -321,6 +325,21 @@ void SiPixelPhase1Summary::fillTrendPlots(DQMStore::IBooker & iBooker, DQMStore:
       toReset->Reset();
     }
   }
+
+  //Now we'll do the normalised FED digi trend plot
+  MonitorElement * digiTrendProfile = iGetter.get("PixelPhase1/num_feddigistrend_per_LumiBlock");
+  MonitorElement * digiTrendPerFED = iGetter.get("PixelPhase1/num_feddigistrend_per_LumiBlock_per_FED");
+
+  //  Int_t binOfInterest = digiTrendProfile->getTProfile()->GetXaxis()->FindBin(lumiSec - 1);
+  Int_t binOfInterest = lumiSec/10 + 1;
+  Int_t bin2 = digiTrendProfile->getTProfile()->FindLastBinAbove();
+  float denominator = digiTrendProfile->getBinContent(binOfInterest);
+  
+  for (int it = 1; it < 140; it++){
+    Float_t numerator = digiTrendPerFED->getBinContent(binOfInterest,it);
+    normalisedFEDDigis_->setBinContent(binOfInterest-1,it,numerator/denominator);
+  }
+
 
 }
 
